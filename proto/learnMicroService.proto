@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package lms;
+
+service Auth {
+  rpc isvalid(TokenMsg) returns (UserMsg) {}
+}
+
+message TokenMsg { 
+    string token = 1; 
+    string api = 2;
+}
+
+message UserMsg {
+  int32 uid = 1;
+  bool access =2;
+  string name = 3;
+  string group = 4;
+}
