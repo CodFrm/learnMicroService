@@ -34,7 +34,9 @@ cd examples/rpc/helloworld
 ```
 默认端口是50051,我竟然不能打开,好像是被占用了,我直接就换了一个,完成.
 
-先运行服务端,然后运行客户端可以看到效果![](img/rpc_c_s.png)
+先运行服务端,然后运行客户端可以看到效果
+
+![](img/rpc_c_s.png)
 
 helloworld.pb.go是通过的插件```protoc-gen-go```编译```helloworld.proto```生成的.虽然可以自动生成,但我还想了解一下实现的方法.然后还需要了解proto的语法,我们才能制作属于我们的rpc调用接口
 
@@ -65,7 +67,7 @@ message UserMsg {
 ```
 更复杂的消息结构还能嵌套,枚举,这里就先只用这一些
 
-上面的服务定义是 单项RPC 的形式,调用完就没了,还有 服务端流式 RPC,客户端流式 RPC和客户端流式 RPC,具体的可以去看一下其他的文字[https://colobu.com/2017/04/06/dive-into-gRPC-streaming/](https://colobu.com/2017/04/06/dive-into-gRPC-streaming/),感觉通常单项RPC就可以了,其他的应该是在一些数据传输的场景使用.
+上面的服务定义是 单项RPC 的形式,调用完就没了,还有 服务端流式 RPC,客户端流式 RPC和客户端流式 RPC,具体的可以去看一下其他的文章[https://colobu.com/2017/04/06/dive-into-gRPC-streaming/](https://colobu.com/2017/04/06/dive-into-gRPC-streaming/),感觉通常单项RPC就可以了,其他的应该是在一些数据传输的场景使用.
 
 #### 生成go文件
 写好proto文件后,我们需要用工具编译成golang代码.windows需要去下载工具[https://github.com/protocolbuffers/protobuf/releases](https://github.com/protocolbuffers/protobuf/releases)
