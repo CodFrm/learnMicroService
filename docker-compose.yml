@@ -1,0 +1,72 @@
+version: '3'
+
+services:
+    kong_migrations: # 构建kong数据库,这个镜像和下面的镜像是一样的
+        image: kong
+        container_name: micro_kong_migrations
+        command: kong migrations bootstrap
+        depends_on:
+            - kong_database
+        environment:
+            - KONG_DATABASE=postgres
+            - KONG_PG_HOST=kong_database
+            - KONG_PG_DATABASE=kong
+            - KONG_PG_PASSWORD=kong
+        networks: 
+            - micro
+
+    kong: # kong网关服务
+        image: kong
+        hostname: kong
+        container_name: micro_kong
+        environment:
+            - KONG_DATABASE=postgres
+            - KONG_PG_HOST=kong_database
+            - KONG_PG_DATABASE=kong
+            - KONG_PG_PASSWORD=kong
+            - KONG_ADMIN_LISTEN=0.0.0.0:8001, 0.0.0.0:8444 ssl
+        depends_on:
+            - kong_migrations
+            - kong_database
+        ports:
+            - "8000:8000"
+            - "8443:8443"
+            - "8001:8001"
+            - "8444:8444"
+        networks:
+            - micro
+
+    kong_dashboard: # kong管理面板
+        image: pantsel/konga
+        container_name: kong_dashboard
+        environment: 
+            - TOKEN_SECRET=micro
+            - NODE_ENV=development
+            - DB_ADAPTER=postgres
+            - DB_HOST=kong_database
+            - DB_USER=kong
+            - DB_PASSWORD=kong
+            - DB_DATABASE=kong
+        depends_on:
+            - kong
+        ports:
+            - 1337:1337
+        networks: 
+            - micro
+          
+    kong_database: # kong数据库 采用的postgres
+        image: postgres
+        hostname: kong_database
+        container_name: micro_kong_database
+        environment: 
+            - POSTGRES_USER=kong
+            - POSTGRES_DB=kong
+            - POSTGRES_PASSWORD=kong
+        ports: 
+            - 5432:5432
+        networks: 
+            - micro
+
+networks:
+    micro:
+        external: true

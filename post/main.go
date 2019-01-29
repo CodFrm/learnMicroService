@@ -65,5 +65,5 @@ func main() {
 	authService = micro.NewAuthClient(rpcConn)
 
 	http.HandleFunc("/post", post)
-	http.ListenAndServe(":8001", nil)
+	http.ListenAndServe(":8004", nil)
 }
