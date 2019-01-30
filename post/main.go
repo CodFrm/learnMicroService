@@ -17,7 +17,7 @@ var authService micro.AuthClient
 
 func genPosts() {
 	//生成帖子
-	posts = append(posts, "我是帖子1")
+	posts = append(posts, "我是帖子124")
 }
 
 func post(w http.ResponseWriter, req *http.Request) {
@@ -31,7 +31,7 @@ func post(w http.ResponseWriter, req *http.Request) {
 			userMsg, err := authService.Isvalid(ctx, &micro.TokenMsg{
 				Token: req.PostFormValue("token"),
 				Api:   "post",
-			})//rpc调用isvalid方法
+			}) //rpc调用isvalid方法
 			println(userMsg.Name)
 			if err != nil {
 				ret = "rpc调用错误"

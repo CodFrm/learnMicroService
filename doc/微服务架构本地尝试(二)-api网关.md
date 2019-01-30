@@ -19,7 +19,7 @@ API网关有很多选择,这里列举几个:[Tyk](https://tyk.io/),[Kong](https:
 
 ### 安装
 搭建请使用Docker,我已经将docker-compose写好了,直接在项目根目录执行:
-```docker-compose up```就可以了
+```docker-compose up```就可以了,这里还有一个要注意的地方就是需要先运行**kong_migrations**,生成数据库文件,如果没有那么**kong**会运行失败.我是运行之后,如果**kong**报错就手动重启**kong_migrations**容器然后再运行**kong**容器的.
 
 参考文档:
 * [konga 面板](https://github.com/pantsel/konga/blob/master/README.md)
@@ -52,4 +52,4 @@ service(服务)在这里的概念可以对应我们的微服务,将我们微服�
 
 浏览器输入[http://127.0.0.1:8000/v1/post](http://127.0.0.1:8000/v1/post)成功得到结果
 
-kong还有很多强大的功能,还可以计费,也有丰富的插件,不过暂时我还用不到,先到这里,下一节预计开始研究 服务注册/发现
+kong还有很多强大的功能,还可以授权,统计,负载均衡等等,也有丰富的插件,不过暂时我还用不到,先到这里,下一节预计开始研究 服务注册/发现

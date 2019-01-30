@@ -21,9 +21,10 @@ services:
         container_name: micro_kong
         environment:
             - KONG_DATABASE=postgres
-            - KONG_PG_HOST=kong_database
+            - KONG_PG_HOST=172.28.1.4
             - KONG_PG_DATABASE=kong
             - KONG_PG_PASSWORD=kong
+            - KONG_DNS_RESOLVER=172.28.1.3:8600
             - KONG_ADMIN_LISTEN=0.0.0.0:8001, 0.0.0.0:8444 ssl
         depends_on:
             - kong_migrations
@@ -65,8 +66,24 @@ services:
         ports: 
             - 5432:5432
         networks: 
-            - micro
+            micro:
+                ipv4_address: 172.28.1.4
+
+    service_center:
+        image: consul
+        hostname: service_center
+        container_name: micro_service_center
+        ports: 
+            - 8500:8500
+            - 8600:8600
+            - 8300:8300
+        networks: 
+            micro:
+                ipv4_address: 172.28.1.3
 
 networks:
     micro:
-        external: true
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.28.0.0/16
