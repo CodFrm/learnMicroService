@@ -34,7 +34,6 @@ func post(w http.ResponseWriter, req *http.Request) {
 				Token: req.PostFormValue("token"),
 				Api:   "post",
 			}) //rpc调用isvalid方法
-			println(userMsg.Name)
 			if err != nil {
 				ret = "rpc调用错误"
 			} else if !userMsg.Access {

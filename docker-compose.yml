@@ -81,6 +81,24 @@ services:
             micro:
                 ipv4_address: 172.28.1.3
 
+    post_1:
+        image: post:latest
+        container_name: micro_post_micro_1
+        depends_on: 
+            - auth_1
+        ports: 
+            - 8004:8004
+        networks: 
+            - micro
+
+    auth_1:
+        image: auth:latest
+        container_name: micro_auth_microo_1
+        depends_on: 
+            - service_center
+        networks: 
+            - micro
+
 networks:
     micro:
         ipam:
