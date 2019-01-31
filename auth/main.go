@@ -9,7 +9,7 @@ import (
 	consul "github.com/CodFrm/learnMicroService/common"
 )
 import "google.golang.org/grpc"
-import micro "../proto"
+import micro "github.com/CodFrm/learnMicroService/proto"
 
 const (
 	port = ":5000"

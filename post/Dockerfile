@@ -4,12 +4,12 @@ COPY ./ /build/
 
 WORKDIR /build
 
-RUN cd post \
-    && go build -ldflags '-w -s'
+RUN go get github.com/CodFrm/learnMicroService &&\
+    go build -ldflags '-w -s'exit
 
 FROM alpine
 
-COPY --from=builder /build/main /run
+COPY --from=builder /build /run
 
 WORKDIR /run
 

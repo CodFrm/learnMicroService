@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	micro "../proto"
+	micro "github.com/CodFrm/learnMicroService/proto"
 
 	consul "github.com/CodFrm/learnMicroService/common"
 )
