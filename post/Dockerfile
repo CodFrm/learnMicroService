@@ -4,8 +4,13 @@ COPY ./ /build/
 
 WORKDIR /build
 
-RUN go get github.com/CodFrm/learnMicroService &&\
-    go build -ldflags '-w -s'exit
+RUN wget https://github.com/grpc/grpc-go/archive/v1.18.0.tar.gz && \
+    tar -zxvf v1.18.0.tar.gz && \
+    mkdir -p $GOPATH/src/google.golang.org/grpc && \
+    mv grpc-go-1.18.0 $GOPATH/src/google.golang.org/grpc && \
+    go get -d -v ./...;exit 0
+
+RUN go build -ldflags '-w -s' && ls -l
 
 FROM alpine
 
