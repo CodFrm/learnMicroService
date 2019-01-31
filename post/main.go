@@ -9,6 +9,8 @@ import (
 	"google.golang.org/grpc"
 
 	micro "../proto"
+
+	consul "github.com/CodFrm/learnMicroService/common"
 )
 
 var posts = make([]string, 0, 1)
@@ -58,12 +60,29 @@ func main() {
 	genPosts()
 	//初始化rpc客户端
 	var err error
-	rpcConn, err = grpc.Dial("localhost:5000", grpc.WithInsecure())
+	//rpc客户端的配置,这里是要auth_micro的
+	rpcService := consul.Service{
+		Name: "auth_micro",
+		Tags: []string{"rpc"},
+	}
+	rpcConn, err = rpcService.GetRPCService() //直接返回rpc
 	if err != nil {
 		println("rpc Service error:%v", err)
 	}
 	authService = micro.NewAuthClient(rpcConn)
 
+	//注册对外的restful服务
+	httpService := consul.Service{
+		Name:    "post_micro",
+		Tags:    []string{"rest"},
+		Address: consul.LocalIP(),
+		Port:    8004,
+	}
+	defer httpService.Deregister()
+	err = httpService.Register()
+	if err != nil {
+		println("service Register error:%v", err)
+	}
 	http.HandleFunc("/post", post)
 	http.ListenAndServe(":8004", nil)
 }

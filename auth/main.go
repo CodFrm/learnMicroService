@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net"
+
+	consul "github.com/CodFrm/learnMicroService/common"
 )
 import "google.golang.org/grpc"
 import micro "../proto"
@@ -60,6 +62,19 @@ func main() {
 	if err != nil {
 		log.Printf("net error:%v", err)
 	}
+	//注册rpc
+	rpcService := consul.Service{
+		Name:    "auth_micro",
+		Tags:    []string{"rpc"},
+		Address: consul.LocalIP(),
+		Port:    5000,
+	}
+	defer rpcService.Deregister()
+	err = rpcService.Register()
+	if err != nil {
+		println("service Register error:%v", err)
+	}
+
 	s := grpc.NewServer()
 	micro.RegisterAuthServer(s, &server{})
 	s.Serve(lis)
