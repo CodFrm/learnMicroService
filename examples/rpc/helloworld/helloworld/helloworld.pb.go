@@ -131,8 +131,15 @@ func NewGreeterClient(cc *grpc.ClientConn) GreeterClient {
 }
 
 func (c *greeterClient) SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error) {
-	out := new(HelloReply)
+	//这里是greeterClient.SayHello的实现
+	out := new(HelloReply) //得到HelloReply这个结构
 	err := c.cc.Invoke(ctx, "/helloworld.Greeter/SayHello", in, out, opts...)
+	//c.cc是grpc客户端连接,Invoke是发送rpc请求
+	//ctx不清楚是什么,感觉是和通信有关的东西吧
+	///helloworld.Greeter/SayHello 在下面用grpc.ServiceDesc定义了,rpc服务的规范
+	//我理解的是helloworld.Greeter为服务名称,SayHello是服务里面的方法
+	//in是请求参数,out应该是请求之后得到的返回结果,存放在HelloReply中
+	//opts调用选项,没深究
 	if err != nil {
 		return nil, err
 	}
@@ -147,15 +154,18 @@ type GreeterServer interface {
 
 func RegisterGreeterServer(s *grpc.Server, srv GreeterServer) {
 	s.RegisterService(&_Greeter_serviceDesc, srv)
+	//注册了服务
 }
 
 func _Greeter_SayHello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HelloRequest)
+	//这里应该是收到客户请求处理调用SayHello的方法
+	//要去了解一下:https://github.com/grpc/grpc-go/blob/master/server.go#L59
+	in := new(HelloRequest) //in是收到的消息
 	if err := dec(in); err != nil {
 		return nil, err
 	}
-	if interceptor == nil {
-		return srv.(GreeterServer).SayHello(ctx, in)
+	if interceptor == nil { //通过搜索得知这是拦截器,可以过滤掉一些请求
+		return srv.(GreeterServer).SayHello(ctx, in) //调用方法,返回结果
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
@@ -164,16 +174,17 @@ func _Greeter_SayHello_Handler(srv interface{}, ctx context.Context, dec func(in
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GreeterServer).SayHello(ctx, req.(*HelloRequest))
 	}
-	return interceptor(ctx, in, info, handler)
+	return interceptor(ctx, in, info, handler) //调用拦截器
 }
 
 var _Greeter_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "helloworld.Greeter",
+	ServiceName: "helloworld.Greeter", //服务名
 	HandlerType: (*GreeterServer)(nil),
-	Methods: []grpc.MethodDesc{
+	Methods: []grpc.MethodDesc{ //方法数组,最好去官方文档看一下声明,和源码
+		//https://godoc.org/google.golang.org/grpc#MethodDesc
 		{
 			MethodName: "SayHello",
-			Handler:    _Greeter_SayHello_Handler,
+			Handler:    _Greeter_SayHello_Handler, //处理方法,也可以说是回调吧
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
