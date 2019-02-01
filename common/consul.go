@@ -46,9 +46,10 @@ func (s *Service) Register() error {
 		Port:    s.Port,
 		Address: s.Address,
 		Check: &api.AgentServiceCheck{
-			TCP:      fmt.Sprintf("%v:%d", s.Address, s.Port),
-			Interval: "10s",
-			Timeout:  "1s",
+			DeregisterCriticalServiceAfter: "10m",
+			TCP:                            fmt.Sprintf("%v:%d", s.Address, s.Port),
+			Interval:                       "10s",
+			Timeout:                        "1s",
 		},
 	}
 	if err := agent.ServiceRegister(reg); err != nil {
@@ -74,7 +75,7 @@ func (s *Service) GetRPCService() (*grpc.ClientConn, error) {
 		host += val + "."
 	}
 	host += s.Name + ".service.consul"
-	conn, err := grpc.Dial("dns://"+consul_ip+":8600/"+host, grpc.WithInsecure())
+	conn, err := grpc.Dial(fmt.Sprintf("dns://%v:8600/%v:%d", consul_ip, host, s.Port), grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
