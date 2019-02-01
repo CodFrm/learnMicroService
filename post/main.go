@@ -59,10 +59,11 @@ func main() {
 	genPosts()
 	//初始化rpc客户端
 	var err error
-	//rpc客户端的配置,这里是要auth_micro的
+	// rpc客户端的配置,这里是要auth_micro的
 	rpcService := consul.Service{
 		Name: "auth_micro",
 		Tags: []string{"rpc"},
+		Port: 5000,
 	}
 	rpcConn, err = rpcService.GetRPCService() //直接返回rpc
 	if err != nil {
