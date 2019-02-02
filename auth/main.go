@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net"
 
@@ -42,7 +41,7 @@ func genUser() {
 
 func (s *server) Isvalid(ctx context.Context, in *micro.TokenMsg) (*micro.UserMsg, error) {
 	//验证token是否有权限访问
-	fmt.Printf("token:%v,api:%v\n", in.Token, in.Api)
+	log.Printf("token:%v,api:%v\n", in.Token, in.Api)
 	if index, ok := tokenList[in.Token]; ok {
 		//登录了
 		return &micro.UserMsg{
@@ -60,7 +59,7 @@ func main() {
 	genUser()
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
-		log.Printf("net error:%v", err)
+		log.Printf("net error:%v\n", err)
 	}
 	//注册rpc
 	rpcService := consul.Service{
@@ -72,7 +71,7 @@ func main() {
 	defer rpcService.Deregister()
 	err = rpcService.Register()
 	if err != nil {
-		println("service Register error:%v", err)
+		log.Printf("service Register error:%v\n", err)
 	}
 
 	s := grpc.NewServer()

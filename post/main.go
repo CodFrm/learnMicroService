@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -67,7 +68,7 @@ func main() {
 	}
 	rpcConn, err = rpcService.GetRPCService() //直接返回rpc
 	if err != nil {
-		println("rpc Service error:%v", err)
+		log.Printf("rpc Service error:%v\n", err)
 	}
 	authService = micro.NewAuthClient(rpcConn)
 
@@ -81,7 +82,7 @@ func main() {
 	defer httpService.Deregister()
 	err = httpService.Register()
 	if err != nil {
-		println("service Register error:%v", err)
+		log.Printf("service Register error:%v\n", err)
 	}
 	http.HandleFunc("/post", post)
 	http.ListenAndServe(":8004", nil)
