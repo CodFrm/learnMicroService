@@ -86,6 +86,7 @@ services:
         container_name: micro_post_micro_1
         depends_on: 
             - auth_1
+            - post_db
         ports: 
             - 8004:8004
         networks: 
@@ -96,6 +97,35 @@ services:
         container_name: micro_auth_microo_1
         depends_on: 
             - service_center
+            - auth_db
+        networks: 
+            - micro
+
+    post_db:
+        image: mysql:5.7
+        hostname: post_db
+        container_name: micro_post_db
+        environment: 
+            - MYSQL_USER=post
+            - MYSQL_PASSWORD=micro_db_pwd
+            - MYSQL_ROOT_PASSWORD=micro_db_pwd
+            - MYSQL_DATABASE=post
+        ports: 
+            - 3308:3306
+        networks: 
+            - micro
+
+    auth_db:
+        image: mysql:5.7
+        hostname: auth_db
+        container_name: micro_auth_db
+        environment: 
+            - MYSQL_USER=auth
+            - MYSQL_PASSWORD=micro_db_pwd
+            - MYSQL_ROOT_PASSWORD=micro_db_pwd
+            - MYSQL_DATABASE=auth
+        ports: 
+            - 3307:3306
         networks: 
             - micro
 

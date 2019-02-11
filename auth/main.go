@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"strconv"
 	"strings"
 
 	common "github.com/CodFrm/learnMicroService/common"
@@ -28,13 +29,13 @@ var db = common.Db{}
 func (s *server) Isvalid(ctx context.Context, in *micro.TokenMsg) (*micro.UserMsg, error) {
 	//验证token是否有权限访问
 	log.Printf("token:%v,api:%v\n", in.Token, in.Api)
-	var uid int32
-	var name string
-	err := db.QueryRow("select * from user where token=?", in.Token).Scan(&uid, &name)
+	var uid, name string
+	err := db.QueryRow("select uid,user from user where token=?", in.Token).Scan(&uid, &name)
 	if err != sql.ErrNoRows {
 		//Token存在
+		id, _ := strconv.Atoi(uid)
 		return &micro.UserMsg{
-			Uid:    uid,
+			Uid:    int32(id),
 			Access: true, //数据库版本后取消权限验证了
 			Name:   name,
 			Group:  "user",
@@ -112,7 +113,21 @@ func main() {
 		log.Printf("service Register error:%v\n", err)
 	}
 
-	err = db.Connect("127.0.0.1", 3306, "root", "", "test")
+	//注册对外的restful服务
+	httpService := common.Service{
+		Name:    "auth_micro",
+		Tags:    []string{"rest"},
+		Address: common.LocalIP(),
+		Port:    8004,
+	}
+	defer httpService.Deregister()
+	err = httpService.Register()
+	if err != nil {
+		log.Printf("service Register error:%v\n", err)
+	}
+
+	//连接数据库
+	err = db.Connect("auth_db", 3306, "auth", "micro_db_pwd", "auth")
 	if err != nil {
 		log.Printf("database connect error:%v\n", err)
 	}

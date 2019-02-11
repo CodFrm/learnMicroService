@@ -99,7 +99,7 @@ func main() {
 		log.Printf("service Register error:%v\n", err)
 	}
 
-	err = db.Connect("127.0.0.1", 3306, "root", "", "test")
+	err = db.Connect("post_db", 3306, "post", "micro_db_pwd", "post")
 	if err != nil {
 		log.Printf("database connect error:%v\n", err)
 	}
