@@ -65,6 +65,8 @@ services:
             - POSTGRES_PASSWORD=kong
         ports: 
             - 5432:5432
+        volumes:
+            - ./service/db/postgres:/var/lib/postgresql
         networks: 
             micro:
                 ipv4_address: 172.28.1.4
@@ -112,6 +114,8 @@ services:
             - MYSQL_DATABASE=post
         ports: 
             - 3308:3306
+        volumes:
+            - ./service/db/post_db:/var/lib/mysql
         networks: 
             - micro
 
@@ -126,6 +130,39 @@ services:
             - MYSQL_DATABASE=auth
         ports: 
             - 3307:3306
+        volumes:
+            - ./service/db/auth_db:/var/lib/mysql
+        networks: 
+            - micro
+
+    zookeeper:
+        image: wurstmeister/zookeeper
+        hostname: zookeeper
+        container_name: micro_zookeeper
+        ports:
+            - 2181:2181
+        networks: 
+            - micro
+
+    kafka:
+        image: wurstmeister/kafka
+        hostname: kafka_mq
+        container_name: micro_kafka_mq
+        environment: 
+            - KAFKA_ADVERTISED_HOST_NAME=10.0.75.1
+            - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+        ports:
+            - 9092:9092
+        networks: 
+            - micro
+
+    kafka_manager:
+        image: sheepkiller/kafka-manager
+        container_name: micro_kafka_manager
+        environment:
+            - ZK_HOSTS=zookeeper
+        ports:  
+            - 9000:9000
         networks: 
             - micro
 
