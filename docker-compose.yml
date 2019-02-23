@@ -156,16 +156,6 @@ services:
         networks: 
             - micro
 
-    kafka_manager:
-        image: sheepkiller/kafka-manager
-        container_name: micro_kafka_manager
-        environment:
-            - ZK_HOSTS=zookeeper
-        ports:  
-            - 9000:9000
-        networks: 
-            - micro
-
 networks:
     micro:
         ipam:

@@ -9,16 +9,25 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceRoot}/auth/main.go",
+            "program": "${workspaceRoot}/lsm.go",
             "env": {},
-            "args": []
+            "args": ["auth"]
         },
         {
             "name": "post Service",
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceRoot}/post/main.go",
+            "program": "${workspaceRoot}/lsm.go",
+            "env": {},
+            "args": ["post"]
+        },
+        {
+            "name": "test",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceRoot}/lsm.go",
             "env": {},
             "args": []
         }

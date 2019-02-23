@@ -1,23 +1,20 @@
-package main
+package post
 
 import (
 	"context"
 	"fmt"
-	"log"
+	"github.com/CodFrm/learnMicroService/core"
 	"net/http"
 	"strings"
 	"time"
 
-	"google.golang.org/grpc"
-
 	micro "github.com/CodFrm/learnMicroService/proto"
 
-	common "github.com/CodFrm/learnMicroService/common"
+	"github.com/CodFrm/learnMicroService/common"
 )
 
-var rpcConn *grpc.ClientConn
 var authService micro.AuthClient
-var db = common.Db{}
+var db *common.Db
 
 func post(w http.ResponseWriter, req *http.Request) {
 	ret := ""
@@ -71,40 +68,43 @@ func init_database() {
 	db.Exec(sql)
 }
 
-func main() {
-	//初始化rpc客户端
-	var err error
-	// rpc客户端的配置,这里是要auth_micro的
-	rpcService := common.Service{
+func Start() {
+	apis := make([]core.HttpApi, 1)
+	services := make(map[string]common.Service)
+	services["post_http"] = common.Service{
+		Name: "post_micro",
+		Tags: []string{"rest"},
+		//Address: common.LocalIP(),
+		Port: 8004,
+	}
+	services["auth_rpc"] = common.Service{
 		Name: "auth_micro",
 		Tags: []string{"rpc"},
 		Port: 5000,
 	}
-	rpcConn, err = rpcService.GetRPCService() //直接返回rpc
+	dbs := make(map[string]core.DbConfig)
+	dbs["post_db"] = core.DbConfig{
+		"127.0.0.1", 3308, "post", "micro_db_pwd", "post",
+	}
+	apis[0] = core.HttpApi{Pattern: "/post", Handler: post}
+	err := core.StartService(core.AppConfig{
+		Http:    core.HttpConfig{Port: 8001, Api: apis},
+		Service: services,
+		Db:      dbs,
+	}, func() {
+		var err error
+		db, err = core.GetDb("post_db")
+		if err != nil {
+			println("db connect error")
+		}
+		rpc, err := core.GetRPCService("auth_rpc")
+		if err != nil {
+			println("rpc connect error")
+		}
+		authService = micro.NewAuthClient(rpc)
+		init_database()
+	})
 	if err != nil {
-		log.Printf("rpc Service error:%v\n", err)
+		println(err)
 	}
-	authService = micro.NewAuthClient(rpcConn)
-
-	//注册对外的restful服务
-	httpService := common.Service{
-		Name:    "post_micro",
-		Tags:    []string{"rest"},
-		Address: common.LocalIP(),
-		Port:    8004,
-	}
-	defer httpService.Deregister()
-	err = httpService.Register()
-	if err != nil {
-		log.Printf("service Register error:%v\n", err)
-	}
-
-	err = db.Connect("post_db", 3306, "post", "micro_db_pwd", "post")
-	if err != nil {
-		log.Printf("database connect error:%v\n", err)
-	}
-	init_database()
-
-	http.HandleFunc("/post", post)
-	http.ListenAndServe(":8004", nil)
 }

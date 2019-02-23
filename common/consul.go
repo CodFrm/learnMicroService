@@ -59,13 +59,13 @@ func (s *Service) Register() error {
 }
 
 //注销服务
-func (s *Service) Deregister() error {
+func (s *Service) Deregister() {
 	agent, err := GetConsulAgent()
 	if err != nil {
-		return err
+		return
 	}
 	agent.ServiceDeregister(s.ServiceId)
-	return nil
+	return
 }
 
 //获取rpc服务(服务发现)

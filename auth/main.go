@@ -1,4 +1,4 @@
-package main
+package auth
 
 import (
 	"context"
@@ -95,7 +95,7 @@ func init_database() {
 	db.Exec(sql)
 }
 
-func main() {
+func Start() {
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Printf("net error:%v\n", err)
