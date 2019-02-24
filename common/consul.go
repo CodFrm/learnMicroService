@@ -75,7 +75,7 @@ func (s *Service) GetRPCService() (*grpc.ClientConn, error) {
 		host += val + "."
 	}
 	host += s.Name + ".service.consul"
-	conn, err := grpc.Dial(s.Address+":5000", grpc.WithInsecure())
+	conn, err := grpc.Dial(fmt.Sprintf("dns://%v:8600/%v:%d", consul_ip, host, s.Port), grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,6 @@ func (s *Service) GetRPCService() (*grpc.ClientConn, error) {
 }
 
 func LocalIP() string {
-	return "127.0.0.1"
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
 		return ""

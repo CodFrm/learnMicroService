@@ -52,10 +52,10 @@ func StartService(config AppConfig, success func()) error {
 		if item.Address == "" {
 			continue
 		}
-		//err := RegisterService(item)
-		//if err != nil {
-		//	return err
-		//}
+		err := RegisterService(item)
+		if err != nil {
+			return err
+		}
 	}
 	for key, item := range config.Db {
 		db, err := ConnectDb(item)

@@ -97,20 +97,20 @@ func Start() {
 	services["auth_rpc"] = common.Service{
 		Name: "auth_micro",
 		Tags: []string{"rpc"},
-		Address: common.LocalIP(),
+		//Address: common.LocalIP(),
 		Port: 5000,
 	}
 	//数据库配置
 	dbs := make(map[string]core.DbConfig)
 	dbs["post_db"] = core.DbConfig{
-		"127.0.0.1", 3308, "post", "micro_db_pwd", "post",
+		"post_db", 3306, "post", "micro_db_pwd", "post",
 	}
 	//微服务配置
 	err := core.StartService(core.AppConfig{
 		Http:    core.HttpConfig{Port: 8021, Api: apis},
 		Service: services,
 		Db:      dbs,
-		Mq:      core.MqConfig{[]string{"127.0.0.1:9092"}},
+		Mq:      core.MqConfig{[]string{"kafka_mq:9092"}},
 	}, func() {
 		var err error
 		db, err = core.GetDb("post_db")

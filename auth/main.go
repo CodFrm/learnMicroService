@@ -149,14 +149,14 @@ func Start() {
 	//数据库配置
 	dbs := make(map[string]core.DbConfig)
 	dbs["auth_db"] = core.DbConfig{
-		"127.0.0.1", 3307, "auth", "micro_db_pwd", "auth",
+		"auth_db", 3306, "auth", "micro_db_pwd", "auth",
 	}
 	//微服务配置
 	err = core.StartService(core.AppConfig{
 		Http:    core.HttpConfig{Port: 8023, Api: apis},
 		Service: services,
 		Db:      dbs,
-		Mq:      core.MqConfig{[]string{"127.0.0.1:9092"}},
+		Mq:      core.MqConfig{[]string{"kafka_mq:9092"}},
 	}, func() {
 		var err error
 		db, err = core.GetDb("auth_db")
