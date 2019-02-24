@@ -3,17 +3,29 @@ syntax = "proto3";
 package lms;
 
 service Auth {
-  rpc isvalid(TokenMsg) returns (UserMsg) {}
+    rpc isvalid (TokenMsg) returns (UserMsg) {
+    }
+    rpc getUser (UserMsgRequest) returns (UserMsgResponse) {
+    }
 }
 
-message TokenMsg { 
-    string token = 1; 
+message TokenMsg {
+    string token = 1;
     string api = 2;
 }
 
 message UserMsg {
-  int32 uid = 1;
-  bool access =2;
-  string name = 3;
-  string group = 4;
+    int32 uid = 1;
+    bool access = 2;
+    string name = 3;
+    string group = 4;
+}
+
+message UserMsgRequest {
+    int32 uid = 1;
+}
+
+message UserMsgResponse {
+    int32 uid = 1;
+    string name = 2;
 }

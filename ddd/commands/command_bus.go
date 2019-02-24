@@ -4,6 +4,6 @@ import (
 	"github.com/CodFrm/learnMicroService/ddd"
 )
 
-func CommandBus(command ddd.CommandMessage) {
-	command.ResolveHandler()
+func CommandBus(command ddd.CommandMessage) error {
+	return command.ResolveHandler()
 }

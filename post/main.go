@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/CodFrm/learnMicroService/core"
+	"github.com/CodFrm/learnMicroService/ddd/commands"
 	"net/http"
 	"strings"
 	"time"
@@ -22,6 +23,7 @@ func post(w http.ResponseWriter, req *http.Request) {
 	case "post":
 		{
 			//远程调用权限验证微服务,判断是否拥有权限
+			//这里应该写在其他地方,这里相当于是Controller层
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 			defer cancel()
 			userMsg, err := authService.Isvalid(ctx, &micro.TokenMsg{
@@ -33,20 +35,30 @@ func post(w http.ResponseWriter, req *http.Request) {
 			} else if !userMsg.Access {
 				ret = "没有权限"
 			} else {
-				ret = userMsg.Name + " post 请求成功"
-				db.Exec("insert into posts(uid,title) values(?,?)", userMsg.Uid, req.PostFormValue("title"))
+				err = commands.CommandBus(&commands.PostCommand{Uid: int(userMsg.Uid), Title: req.PostFormValue("title")})
+				if err != nil {
+					ret = err.Error()
+				} else {
+					ret = userMsg.Name + " post 请求成功"
+				}
+				//ret = userMsg.Name + " post 请求成功"
+				//db.Exec("insert into posts(uid,title) values(?,?)", userMsg.Uid, req.PostFormValue("title"))
 			}
 			break
 		}
 	case "get":
 		{
-			rows, err := db.Query("select a.id,b.user,a.title from posts as a join user as b on a.uid=b.uid")
+			//查询直接从数据库查询
+			rows, err := db.Query("select id,uid,name,title,createtime from posts")
 			if err != nil {
 				ret = "帖子列表错误 error:" + err.Error()
 			} else {
 				for rows.Next() {
 					var id, name, title string
-					rows.Scan(&id, &name, &title)
+					err := rows.Scan(&id, &name, &title)
+					if err != nil {
+						break
+					}
 					ret += fmt.Sprintf("帖子id:%v 发帖用户:%v 帖子标题:%v\n", id, name, title)
 				}
 			}
@@ -61,7 +73,9 @@ func init_database() {
 	CREATE TABLE IF NOT EXISTS posts (
 		id int(11) NOT NULL AUTO_INCREMENT,
 		uid int(11) NOT NULL,
-		title varchar(255) NOT NULL,
+		name varchar(64) CHARACTER SET utf8 DEFAULT NULL,
+		title varchar(255) CHARACTER SET utf8 NOT NULL,
+		createtime int(11) DEFAULT NULL,
 		PRIMARY KEY (id)
 	  ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 	`
@@ -69,28 +83,34 @@ func init_database() {
 }
 
 func Start() {
+	//http 接口列表
 	apis := make([]core.HttpApi, 1)
+	apis[0] = core.HttpApi{Pattern: "/post", Handler: post}
+	//注册服务
 	services := make(map[string]common.Service)
 	services["post_http"] = common.Service{
 		Name: "post_micro",
 		Tags: []string{"rest"},
-		//Address: common.LocalIP(),
+		Address: common.LocalIP(),
 		Port: 8004,
 	}
 	services["auth_rpc"] = common.Service{
 		Name: "auth_micro",
 		Tags: []string{"rpc"},
+		Address: common.LocalIP(),
 		Port: 5000,
 	}
+	//数据库配置
 	dbs := make(map[string]core.DbConfig)
 	dbs["post_db"] = core.DbConfig{
 		"127.0.0.1", 3308, "post", "micro_db_pwd", "post",
 	}
-	apis[0] = core.HttpApi{Pattern: "/post", Handler: post}
+	//微服务配置
 	err := core.StartService(core.AppConfig{
-		Http:    core.HttpConfig{Port: 8001, Api: apis},
+		Http:    core.HttpConfig{Port: 8021, Api: apis},
 		Service: services,
 		Db:      dbs,
+		Mq:      core.MqConfig{[]string{"127.0.0.1:9092"}},
 	}, func() {
 		var err error
 		db, err = core.GetDb("post_db")

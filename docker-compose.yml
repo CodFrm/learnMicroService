@@ -148,6 +148,8 @@ services:
         image: wurstmeister/kafka
         hostname: kafka_mq
         container_name: micro_kafka_mq
+        depends_on:
+            - zookeeper
         environment: 
             - KAFKA_ADVERTISED_HOST_NAME=10.0.75.1
             - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
