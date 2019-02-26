@@ -159,6 +159,7 @@ func Start() {
 		Db:      dbs,
 		Mq:      core.MqConfig{[]string{"kafka_mq:9092"}},
 	}, func() {
+		println("success run")
 		var err error
 		db, err = core.GetDb("auth_db")
 		if err != nil {
@@ -175,6 +176,6 @@ func Start() {
 		}
 	})
 	if err != nil {
-		println(err)
+		println(err.Error())
 	}
 }

@@ -43,6 +43,7 @@ var appConfig AppConfig
 var rpcService map[string]*grpc.ClientConn
 var dbConnect map[string]*common.Db
 var mqClient sarama.Client
+
 //开启服务
 func StartService(config AppConfig, success func()) error {
 	appConfig = config
@@ -91,6 +92,7 @@ func ConnectMq(mq MqConfig) error {
 }
 
 var produce sarama.SyncProducer
+
 //通过消息队列发送一条消息
 func SendMessage(topic string, value string) error {
 	if produce == nil {
@@ -149,7 +151,7 @@ func StartHttp(port int, api []HttpApi) error {
 }
 
 func RegisterService(service common.Service) error {
-	defer service.Deregister()
+	//defer service.Deregister()
 	return service.Register()
 }
 

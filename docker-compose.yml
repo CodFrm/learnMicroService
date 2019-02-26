@@ -91,6 +91,7 @@ services:
         depends_on: 
             - auth_1
             - post_db
+            - kafka
         ports: 
             - 8004:8004
         networks: 
@@ -104,6 +105,7 @@ services:
         depends_on: 
             - service_center
             - auth_db
+            - kafka
         networks: 
             - micro
 

@@ -126,6 +126,6 @@ func Start() {
 		init_database()
 	})
 	if err != nil {
-		println(err)
+		println(err.Error())
 	}
 }
