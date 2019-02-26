@@ -1,14 +1,15 @@
 package main
 
 import (
+	"os"
+
 	"github.com/CodFrm/learnMicroService/auth"
 	"github.com/CodFrm/learnMicroService/post"
-	"os"
 )
 
 func main() {
-	if len(os.Args) < 1 {
-		println("auth post test")
+	if len(os.Args) < 2 {
+		println("auth post")
 		return
 	}
 	switch os.Args[1] {
@@ -27,7 +28,4 @@ func main() {
 
 		}
 	}
-	// post := &commands.PostCommand{Uid: 1, Title: "哈哈"}
-
-	// commands.CommandBus(post)
 }

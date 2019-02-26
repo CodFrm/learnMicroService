@@ -9,7 +9,7 @@ ENV HTTP_PROXY=http://10.0.75.1:1080/ \
     CGO_ENABLED=0 \
     GOOS=linux
 
-RUN go get -d -v ./... && \
+RUN go get -d -v . && \
     go build -a -installsuffix cgo -o app . && ls
 
 FROM alpine

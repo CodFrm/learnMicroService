@@ -3,11 +3,12 @@ package post
 import (
 	"context"
 	"fmt"
-	"github.com/CodFrm/learnMicroService/core"
-	"github.com/CodFrm/learnMicroService/ddd/commands"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/CodFrm/learnMicroService/core"
+	"github.com/CodFrm/learnMicroService/ddd/commands"
 
 	micro "github.com/CodFrm/learnMicroService/proto"
 
@@ -89,10 +90,10 @@ func Start() {
 	//注册服务
 	services := make(map[string]common.Service)
 	services["post_http"] = common.Service{
-		Name: "post_micro",
-		Tags: []string{"rest"},
+		Name:    "post_micro",
+		Tags:    []string{"rest"},
 		Address: common.LocalIP(),
-		Port: 8004,
+		Port:    8004,
 	}
 	services["auth_rpc"] = common.Service{
 		Name: "auth_micro",
@@ -107,7 +108,7 @@ func Start() {
 	}
 	//微服务配置
 	err := core.StartService(core.AppConfig{
-		Http:    core.HttpConfig{Port: 8021, Api: apis},
+		Http:    core.HttpConfig{Port: 8004, Api: apis},
 		Service: services,
 		Db:      dbs,
 		Mq:      core.MqConfig{[]string{"kafka_mq:9092"}},

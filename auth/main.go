@@ -3,13 +3,14 @@ package auth
 import (
 	"context"
 	"database/sql"
-	"github.com/CodFrm/learnMicroService/core"
-	"github.com/CodFrm/learnMicroService/ddd/events"
 	"log"
 	"net"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/CodFrm/learnMicroService/core"
+	"github.com/CodFrm/learnMicroService/ddd/events"
 
 	"github.com/CodFrm/learnMicroService/common"
 	"google.golang.org/grpc"
@@ -153,7 +154,7 @@ func Start() {
 	}
 	//微服务配置
 	err = core.StartService(core.AppConfig{
-		Http:    core.HttpConfig{Port: 8023, Api: apis},
+		Http:    core.HttpConfig{Port: 8004, Api: apis},
 		Service: services,
 		Db:      dbs,
 		Mq:      core.MqConfig{[]string{"kafka_mq:9092"}},
