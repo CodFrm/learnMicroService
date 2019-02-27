@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
     kong_migrations: # 构建kong数据库,这个镜像和下面的镜像是一样的
@@ -12,7 +12,7 @@ services:
             - KONG_PG_HOST=kong_database
             - KONG_PG_DATABASE=kong
             - KONG_PG_PASSWORD=kong
-        networks: 
+        networks:
             - micro
 
     kong: # kong网关服务
@@ -40,7 +40,7 @@ services:
     kong_dashboard: # kong管理面板
         image: pantsel/konga
         container_name: kong_dashboard
-        environment: 
+        environment:
             - TOKEN_SECRET=micro
             - NODE_ENV=development
             - DB_ADAPTER=postgres
@@ -52,22 +52,22 @@ services:
             - kong
         ports:
             - 1337:1337
-        networks: 
+        networks:
             - micro
-          
+
     kong_database: # kong数据库 采用的postgres
         image: postgres
         hostname: kong_database
         container_name: micro_kong_database
-        environment: 
+        environment:
             - POSTGRES_USER=kong
             - POSTGRES_DB=kong
             - POSTGRES_PASSWORD=kong
-        ports: 
+        ports:
             - 5432:5432
         volumes:
             - pgdata:/var/lib/postgresql/data
-        networks: 
+        networks:
             micro:
                 ipv4_address: 172.28.1.4
 
@@ -75,11 +75,11 @@ services:
         image: consul
         hostname: service_center
         container_name: micro_service_center
-        ports: 
+        ports:
             - 8500:8500
             - 8600:8600
             - 8300:8300
-        networks: 
+        networks:
             micro:
                 ipv4_address: 172.28.1.3
 
@@ -88,13 +88,13 @@ services:
         image: learnmicroservice:latest
         container_name: micro_post_micro_1
         command: ./app post
-        depends_on: 
+        depends_on:
             - auth_1
             - post_db
-            - kafka
-        ports: 
+            - kafka_mq
+        ports:
             - 8004:8004
-        networks: 
+        networks:
             - micro
 
     auth_1:
@@ -102,43 +102,43 @@ services:
         image: learnmicroservice:latest
         container_name: micro_auth_micro_1
         command: ./app auth
-        depends_on: 
+        depends_on:
             - service_center
             - auth_db
-            - kafka
-        networks: 
+            - kafka_mq
+        networks:
             - micro
 
     post_db:
         image: mysql:5.7
         hostname: post_db
         container_name: micro_post_db
-        environment: 
+        environment:
             - MYSQL_USER=post
             - MYSQL_PASSWORD=micro_db_pwd
             - MYSQL_ROOT_PASSWORD=micro_db_pwd
             - MYSQL_DATABASE=post
-        ports: 
+        ports:
             - 3308:3306
         volumes:
             - ./service/db/post_db:/var/lib/mysql
-        networks: 
+        networks:
             - micro
 
     auth_db:
         image: mysql:5.7
         hostname: auth_db
         container_name: micro_auth_db
-        environment: 
+        environment:
             - MYSQL_USER=auth
             - MYSQL_PASSWORD=micro_db_pwd
             - MYSQL_ROOT_PASSWORD=micro_db_pwd
             - MYSQL_DATABASE=auth
-        ports: 
+        ports:
             - 3307:3306
         volumes:
             - ./service/db/auth_db:/var/lib/mysql
-        networks: 
+        networks:
             - micro
 
     zookeeper:
@@ -147,21 +147,21 @@ services:
         container_name: micro_zookeeper
         ports:
             - 2181:2181
-        networks: 
+        networks:
             - micro
 
-    kafka:
+    kafka_mq:
         image: wurstmeister/kafka
         hostname: kafka_mq
         container_name: micro_kafka_mq
         depends_on:
             - zookeeper
-        environment: 
+        environment:
             - KAFKA_ADVERTISED_HOST_NAME=10.0.75.1
             - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
         ports:
             - 9092:9092
-        networks: 
+        networks:
             - micro
 
 networks:
@@ -171,5 +171,5 @@ networks:
             config:
                 - subnet: 172.28.0.0/16
 
-volumes:
+volumes: 
     pgdata:

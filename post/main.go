@@ -50,14 +50,15 @@ func post(w http.ResponseWriter, req *http.Request) {
 	case "get":
 		{
 			//查询直接从数据库查询
-			rows, err := db.Query("select id,uid,name,title,createtime from posts")
+			rows, err := db.Query("select id,name,title from posts")
 			if err != nil {
-				ret = "帖子列表错误 error:" + err.Error()
+				ret += "帖子列表错误 error:" + err.Error()
 			} else {
 				for rows.Next() {
 					var id, name, title string
 					err := rows.Scan(&id, &name, &title)
 					if err != nil {
+						ret += err.Error()
 						break
 					}
 					ret += fmt.Sprintf("帖子id:%v 发帖用户:%v 帖子标题:%v\n", id, name, title)

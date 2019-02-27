@@ -3,11 +3,12 @@ package core
 import (
 	"context"
 	"errors"
+	"net/http"
+	"strconv"
+
 	"github.com/CodFrm/learnMicroService/common"
 	"github.com/Shopify/sarama"
 	"google.golang.org/grpc"
-	"net/http"
-	"strconv"
 )
 
 type HttpApi struct {
@@ -151,7 +152,7 @@ func StartHttp(port int, api []HttpApi) error {
 }
 
 func RegisterService(service common.Service) error {
-	//defer service.Deregister()
+	// defer service.Deregister()
 	return service.Register()
 }
 
